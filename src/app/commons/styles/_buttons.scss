@@ -1,0 +1,193 @@
+// Importar las variables de colores si están en otro archivo
+@use "sass:color";
+
+// Variables de botones
+$btn-border-radius: 0.5rem;
+$btn-transition: all 0.2s ease-in-out;
+$btn-font-weight: 600;
+
+// Mixin para estilos base de botones
+@mixin button-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: $btn-border-radius;
+  font-weight: $btn-font-weight;
+  font-size: 1rem;
+  transition: $btn-transition;
+  border: none;
+  cursor: pointer;
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  i, svg, img {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+}
+
+// Botón primario
+.btn-primary {
+  @include button-base;
+  background-color: #0C2C56;  // Navy Blue
+  color: #FFFFFF;
+  
+  &:hover:not(:disabled) {
+    background-color: color.adjust(#0C2C56, $lightness: -10%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(#0C2C56, 0.2);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+}
+
+// Botón secundario
+.btn-secondary {
+  @include button-base;
+  background-color: #005C5C;  // Northwest Green
+  color: #FFFFFF;
+  
+  &:hover:not(:disabled) {
+    background-color: color.adjust(#005C5C, $lightness: -10%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(#005C5C, 0.2);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+}
+
+// Botón de cancelar
+.btn-cancel {
+  @include button-base;
+  background-color: #C4CED4;  // Silver
+  color: #0C2C56;
+  
+  &:hover:not(:disabled) {
+    background-color: color.adjust(#C4CED4, $lightness: -10%);
+    transform: translateY(-2px);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+}
+
+// Botón de descarga
+.btn-download {
+  @include button-base;
+  background-color: #005C5C;  // Northwest Green
+  color: #FFFFFF;
+  padding-left: 1.25rem;
+  padding-right: 1.25rem;
+  
+  &::before {
+    content: "⬇️";
+    margin-right: 0.5rem;
+  }
+  
+  &:hover:not(:disabled) {
+    background-color: color.adjust(#005C5C, $lightness: -10%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(#005C5C, 0.2);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+}
+
+// Variantes de tamaño
+.btn-sm {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+}
+
+.btn-lg {
+  padding: 1rem 2rem;
+  font-size: 1.125rem;
+}
+
+// Variante outline para cada tipo de botón
+.btn-primary-outline {
+  @include button-base;
+  background-color: transparent;
+  border: 2px solid #0C2C56;
+  color: #0C2C56;
+  
+  &:hover:not(:disabled) {
+    background-color: #0C2C56;
+    color: #FFFFFF;
+    transform: translateY(-2px);
+  }
+}
+
+.btn-secondary-outline {
+  @include button-base;
+  background-color: transparent;
+  border: 2px solid #005C5C;
+  color: #005C5C;
+  
+  &:hover:not(:disabled) {
+    background-color: #005C5C;
+    color: #FFFFFF;
+    transform: translateY(-2px);
+  }
+}
+
+// Variante de botón con icono
+.btn-icon {
+  @include button-base;
+  padding: 0.75rem;
+  border-radius: 50%;
+  aspect-ratio: 1;
+  
+  i, svg, img {
+    margin: 0;
+  }
+}
+
+// Grupo de botones
+.btn-group {
+  display: inline-flex;
+  gap: 0.5rem;
+  
+  &--vertical {
+    flex-direction: column;
+  }
+}
+
+// Botón de carga
+.btn-loading {
+  position: relative;
+  cursor: wait;
+  
+  &::after {
+    content: "";
+    position: absolute;
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid transparent;
+    border-top-color: currentColor;
+    border-radius: 50%;
+    animation: button-loading-spinner 0.6s linear infinite;
+  }
+}
+
+@keyframes button-loading-spinner {
+  from {
+    transform: rotate(0turn);
+  }
+  to {
+    transform: rotate(1turn);
+  }
+}
