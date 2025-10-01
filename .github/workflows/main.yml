@@ -2,8 +2,8 @@ name: Deploy Angular App to AWS
 
 # Variables de entorno - deben ir aquí al nivel superior
 env:
-  S3_BUCKET_NAME: "agentes-system-137.site"
-  CLOUDFRONT_DISTRIBUTION_ID: "E2HVSCW3C1QB3K"
+  S3_BUCKET_NAME: "business-finder.online"
+  CLOUDFRONT_DISTRIBUTION_ID: "ELT1HFTD04ALK"
 
 on:
   push:
