@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Business, BusinessType, SearchResults } from '../interfaces/business';
 
@@ -13,6 +13,10 @@ export class BusinessService {
   constructor(private http: HttpClient) {}
 
   searchBusinesses(searchData: any): Observable<SearchResults> {
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'X-Goog-FieldMask': 'places.displayName,places.formattedAddress,places.nationalPhoneNumber'
+    });
     return this.http.post<SearchResults>(`${this.apiUrl}/api/businesses/search`, searchData);
   }
 
