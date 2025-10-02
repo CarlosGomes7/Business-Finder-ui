@@ -1,0 +1,108 @@
+<div class="welcome-container">
+  <div class="background-effects">
+    <div class="effect-circle effect-1"></div>
+    <div class="effect-circle effect-2"></div>
+  </div>
+
+  <div class="content-wrapper">
+    <div class="welcome-card">
+      <div class="logo-container">
+        <div class="logo-icon">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="40"
+            height="40"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+        </div>
+      </div>
+
+      <div class="header-section">
+        <h1 class="app-title">Business Finder</h1>
+        <p class="creator-info">
+          Desarrollado por <span class="creator-name">system-137</span>
+        </p>
+      </div>
+
+      <div class="form-section">
+        <div class="form-group">
+          <label for="code" class="form-label"> Código de Acceso </label>
+          <div class="input-wrapper">
+            <input
+              id="code"
+              type="text"
+              [(ngModel)]="code"
+              (ngModelChange)="onCodeChange()"
+              (keypress)="handleKeyPress($event)"
+              placeholder="Ingresa tu código"
+              class="form-input"
+              [class.input-error]="error"
+              [class.input-valid]="isValid"
+            />
+            @if (isValid) {
+                <svg
+                  class="check-icon"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                  <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+            }            
+          </div>
+          @if (error) {
+            <p class="error-message">
+            {{ error }}
+            </p>
+          }
+        </div>
+
+        <button (click)="handleSubmit()" class="submit-button">
+          Acceder
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </button>
+      </div>
+
+      <div class="footer-section">
+        <p class="footer-text">
+          ¿No tienes un código de acceso?
+          <button (click)="requestAccess()" class="request-access-btn">
+            Solicitar acceso
+          </button>
+        </p>
+      </div>
+    </div>
+
+    <p class="copyright">
+      © 2024 Business Finder. Todos los derechos reservados.
+    </p>
+  </div>
+</div>

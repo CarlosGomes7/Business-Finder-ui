@@ -1,0 +1,301 @@
+<div class="app-container">
+  <div class="content-container">
+    <!-- Header -->
+    <header>
+      <h1 class="page-title">
+        🎯 Business Finder
+      </h1>
+      <p class="page-subtitle">
+        Encuentra negocios locales sin página web para ofrecer tus servicios
+      </p>
+    </header>
+
+    <!-- Search Form -->
+    <div class="card">
+      <h2 class="card__title">Configurar Búsqueda</h2>
+      
+      <!-- Location Inputs -->
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="label">
+            📍 Latitud
+          </label>
+          <input
+            type="number"
+            step="any"
+            [(ngModel)]="searchParams.lat"
+            class="input"
+            placeholder="Ej: -12.0464"
+          >
+        </div>
+        
+        <div class="form-group">
+          <label class="label">
+            📍 Longitud
+          </label>
+          <input
+            type="number"
+            step="any"
+            [(ngModel)]="searchParams.lng"
+            class="input"
+            placeholder="Ej: -77.0428"
+          >
+        </div>
+        
+        <div class="form-group">
+          <label class="label">
+            📏 Radio (metros)
+          </label>
+          <input
+            type="number"
+            [(ngModel)]="searchParams.radius"
+            class="input"
+            placeholder="5000"
+          >
+        </div>
+      </div>
+
+      <!-- Business Types -->
+      <div class="form-group">
+        <label class="label">
+          🏪 Tipos de Negocio
+        </label>
+        <div class="checkbox-grid">
+          @for (type of businessTypes; track $index) {
+            <div class="checkbox-item">
+              <input
+                type="checkbox"
+                [id]="type.value"
+                [value]="type.value"
+                (change)="onBusinessTypeChange($event)"
+              >
+              <label [for]="type.value">
+                {{ type.label }}
+              </label>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="button-group">
+        <button
+          (click)="getCurrentLocation()"
+          [disabled]="isLoading"
+          class="btn btn--success"
+        >
+        @if (isLoading) {
+          <span class="animate-spin">⏳</span>
+        }
+          📍 Mi Ubicación Actual
+        </button>
+        
+        <button
+          (click)="searchBusinesses()"
+          [disabled]="isLoading || !isValidLocation()"
+          class="btn btn--primary"
+        >
+        @if (isLoading) {<span class="animate-spin">⏳</span>}          
+          {{ isLoading ? 'Buscando...' : '🔍 Buscar Negocios' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Error Message -->
+     @if(errorMessage){
+        <div class="error-message">
+          ⚠️ {{ errorMessage }}
+          <button (click)="errorMessage = ''">✕</button>
+        </div>
+     }
+
+    <!-- Results Summary -->
+     @if (searchResults) {
+      <div class="results-summary">
+        <h2 class="results-summary__title">📊 Resumen de Resultados</h2>
+        
+        <div class="results-summary__grid">
+          <div class="results-summary__stat results-summary__stat--total">
+            <div class="number">{{ searchResults.total }}</div>
+            <div class="label">Total Negocios</div>
+          </div>
+          
+          <div class="results-summary__stat results-summary__stat--without">
+            <div class="number">{{ searchResults.withoutWebsite }}</div>
+            <div class="label">Sin Página Web</div>
+          </div>
+          
+          <div class="results-summary__stat results-summary__stat--with">
+            <div class="number">{{ searchResults.withWebsite }}</div>
+            <div class="label">Con Página Web</div>
+          </div>
+        </div>
+
+      <!-- Filter Buttons -->
+      <div class="button-group">
+        <button
+          (click)="showBusinessesWithoutWebsite = true; showBusinessesWithWebsite = false"
+          class="filter-button"
+          [class.filter-button--without]="showBusinessesWithoutWebsite"
+          [class.active]="showBusinessesWithoutWebsite"
+          [class.filter-button--inactive]="!showBusinessesWithoutWebsite"
+        >
+          📋 Ver Sin Página Web ({{ searchResults.withoutWebsite }})
+        </button>
+        
+        <button
+          (click)="showBusinessesWithWebsite = true; showBusinessesWithoutWebsite = false"
+          class="filter-button"
+          [class.filter-button--with]="showBusinessesWithWebsite"
+          [class.active]="showBusinessesWithWebsite"
+          [class.filter-button--inactive]="!showBusinessesWithWebsite"
+        >
+          🌐 Ver Con Página Web ({{ searchResults.withWebsite }})
+        </button>
+      </div>
+
+      <button
+        (click)="exportBusinesses('csv')"
+        class="export-button"
+      >
+        📊 Exportar a CSV
+      </button>
+    </div>
+     }
+    
+
+    <!-- Business List -->
+     @if (getDisplayBusinesses().length > 0) {
+      <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+      <h3 class="text-xl font-semibold mb-4 text-gray-800">
+        {{ showBusinessesWithoutWebsite ? '✨ Negocios sin Página Web (¡Oportunidades!)' : '🌐 Negocios con Página Web' }}
+        ({{ getDisplayBusinesses().length }})
+      </h3>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        @for (business of getDisplayBusinesses(); track $index) {
+        <div class="business-card"
+          [class.business-card--without-website]="!business.hasWebsite"
+          [class.business-card--with-website]="business.hasWebsite"
+        >
+          <h4 class="business-card__title">{{ business.name }}</h4>
+          
+          <div class="business-card__info">
+            <p>
+              <span>📍</span>
+              <span>{{ business.address }}</span>
+            </p>
+            @if(business.phone){
+              <p>
+                <span>📞</span>
+                <a [href]="'tel:' + business.phone">
+                  {{ business.phone }}
+                </a>
+              </p>
+            }
+            
+            @if(business.website){
+              <p>
+                <span>🌐</span>
+                <a [href]="business.website" target="_blank">
+                  Visitar sitio web
+                </a>
+              </p>
+            }@else {
+              <p class="business-card__opportunity">
+                <span>✨</span>
+                <span>¡Sin página web - Gran oportunidad!</span>
+              </p>
+            }
+            @if(business.rating){
+              <p>
+                <span>⭐</span>
+                <span>{{ business.rating }}/5 ({{ business.totalRatings }} reseñas)</span>
+              </p>
+            }
+            
+            <div class="business-card__tags">
+              <p>🏷️ Categorías:</p>
+              <div class="container-tag">
+                @for (type of business.types.slice(0, 3); track $index) {
+                <span class="tag">
+                  {{ formatBusinessType(type) }}
+                </span>
+                }
+              </div>
+            </div>
+          </div>
+          
+          <div class="business-card__actions">
+            <button
+              (click)="openInGoogleMaps(business)"
+              class="action-button action-button--maps"
+            >
+            Ver en Maps
+            </button>
+            
+            @if (!business.hasWebsite) {
+            <button
+              (click)="addToLeadList(business)"
+              class="action-button action-button--add"
+            >
+              ➕ Agregar a Lista
+            </button>
+            }
+            
+          </div>
+        </div>
+        }
+        
+      </div>
+    </div>
+     }
+    
+
+    <!-- Lead List -->
+     @if (leadList.length > 0) {
+      <div class="lead-list">
+        <h3 class="lead-list__title">
+          📋 Lista de Prospectos ({{ leadList.length }})
+        </h3>
+        
+        <div class="lead-list__actions">
+          <button
+            (click)="clearLeadList()"
+            class="lead-button lead-button--clear"
+          >
+            🗑️ Limpiar Lista
+          </button>
+          
+          <button
+            (click)="exportLeads()"
+            class="lead-button lead-button--export"
+          >
+            📤 Exportar Prospectos
+          </button>
+        </div>
+
+        <div class="lead-list__items">
+          @for (lead of leadList; track $index) {
+            <div class="lead-list__item">
+              <div class="lead-list__item-info">
+                <h4>{{ lead.name }}</h4>
+                <p>📍 {{ lead.address }}</p>
+                @if (lead.phone) {<p class="phone">📞 {{ lead.phone }}</p>}
+              </div>
+              <button
+                (click)="removeFromLeadList($index)"
+                class="lead-list__item-remove"
+                title="Eliminar de la lista"
+              >
+                ❌
+              </button>
+            </div>
+          }
+        
+      </div>
+    </div>
+    }
+    
+  </div>
+</div>
