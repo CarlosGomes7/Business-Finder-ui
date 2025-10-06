@@ -13,6 +13,12 @@ export const routes: Routes = [
             return import('./business/home/home.component').then(m => m.HomeComponent);
         }
 	},
+    {
+        path: 'leads',
+        loadComponent() {
+            return import('./business/leads-manager/leads-manager.component').then(m => m.LeadsManagerComponent);
+        }
+    },
     { path: '', redirectTo: '/welcome', pathMatch: 'full' },
     { path: '**', redirectTo: '', pathMatch: 'full' }
 ];

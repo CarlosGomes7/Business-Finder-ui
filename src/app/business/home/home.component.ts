@@ -3,10 +3,12 @@ import { Business, BusinessType, SearchResults } from '../../interfaces/business
 import { BusinessService } from '../../services/business.service';
 import { GeolocationService } from '../../services/geolocation.service';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
+import { GoogleMapsModule } from '@angular/google-maps';
 
 @Component({
   selector: 'app-home',
-  imports: [FormsModule],
+  imports: [FormsModule, GoogleMapsModule],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
   standalone: true
@@ -20,6 +22,13 @@ title = 'Business Finder';
     radius: 5000
   };
 
+  center: google.maps.LatLngLiteral = {
+    lat: this.searchParams.lat,
+    lng: this.searchParams.lng
+  };
+  zoom = 13;
+  markerPosition = { ...this.center };
+
   selectedBusinessTypes: string[] = ['establishment'];
   businessTypes: BusinessType[] = [];
   isLoading = false;
@@ -31,7 +40,8 @@ title = 'Business Finder';
 
   constructor(
     private businessService: BusinessService,
-    private geolocationService: GeolocationService
+    private geolocationService: GeolocationService,
+    private router: Router
   ) {}
 
   ngOnInit() {
@@ -187,6 +197,19 @@ title = 'Business Finder';
     link.download = filename;
     link.click();
     window.URL.revokeObjectURL(url);
+  }
+
+  goToLeadsManager(): void {
+    this.router.navigate(['/leads']);
+  }
+
+  onMapClick(event: google.maps.MapMouseEvent) {
+    if (event.latLng) {
+      this.searchParams.lat = event.latLng.lat();
+      this.searchParams.lng = event.latLng.lng();
+      this.markerPosition = { lat: this.searchParams.lat, lng: this.searchParams.lng };
+      this.center = { ...this.markerPosition };
+    }
   }
 
 }

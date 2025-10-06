@@ -1,0 +1,154 @@
+<div class="leads-manager">
+  <header class="header">
+    <h1>🚀 System-137 - Gestor de Leads</h1>
+    <p>Procesa tus leads y genera mensajes personalizados con IA</p>
+  </header>
+
+  <div class="upload-section">
+    <div class="upload-card">
+      <h3>📁 Cargar Archivo</h3>
+      <input
+        type="file"
+        accept=".csv"
+        (change)="onFileSelected($event)"
+        id="fileInput"
+        class="file-input"
+      />
+      <label for="fileInput" class="file-label">
+        {{ selectedFile ? selectedFile.name : "Seleccionar CSV" }}
+      </label>
+      <button
+        (click)="uploadCSV()"
+        [disabled]="!selectedFile || loading"
+        class="btn-primary"
+      >
+        {{ loading ? "Procesando..." : "Procesar CSV" }}
+      </button>
+    </div>
+  </div>
+
+  @if (leads.length > 0) {
+  <div class="statistics">
+    <div class="stat-card">
+      <div class="stat-number">{{ getStatistics().total }}</div>
+      <div class="stat-label">Total Leads</div>
+    </div>
+    <div class="stat-card high">
+      <div class="stat-number">{{ getStatistics().high }}</div>
+      <div class="stat-label">Alta Prioridad</div>
+    </div>
+    <div class="stat-card medium">
+      <div class="stat-number">{{ getStatistics().medium }}</div>
+      <div class="stat-label">Media Prioridad</div>
+    </div>
+    <div class="stat-card low">
+      <div class="stat-number">{{ getStatistics().low }}</div>
+      <div class="stat-label">Baja Prioridad</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">{{ getStatistics().sent }}</div>
+      <div class="stat-label">Enviados</div>
+    </div>
+  </div>
+  } 
+  @if(leads.length > 0){
+  <div class="filters">
+    <div class="filter-group">
+      <label>Prioridad:</label>
+      <select
+        [(ngModel)]="filterPriority"
+        (change)="filterByPriority(filterPriority)"
+      >
+        <option value="all">Todas</option>
+        <option value="high">Alta</option>
+        <option value="medium">Media</option>
+        <option value="low">Baja</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label>Buscar:</label>
+      <input
+        type="text"
+        [(ngModel)]="searchTerm"
+        (input)="searchLeads()"
+        placeholder="Nombre del negocio..."
+      />
+    </div>
+
+    <button (click)="exportToCSV()" class="btn-export">📥 Exportar CSV</button>
+  </div>
+  } @if (filteredLeads.length > 0) {
+  <div class="leads-grid">
+    @for (lead of filteredLeads; track $index) {
+    <div class="lead-card" [class.sent]="lead.sent">
+      <div class="lead-header">
+        <h3>{{ lead.Name }}</h3>
+        <span [class]="'priority-badge ' + getPriorityClass(lead.priority)">
+          {{ getPriorityLabel(lead.priority) }}
+        </span>
+      </div>
+
+      <div class="lead-info">
+        <p><strong>📍</strong> {{ lead.Address }}</p>
+        <p><strong>📱</strong> {{ lead.Phone || "Sin teléfono" }}</p>
+        <p><strong>📦</strong> Paquete: {{ lead.recommendedPackage }}</p>
+        <p><strong>💰</strong> {{ lead.estimatedBudget }}</p>
+      </div>
+
+      @if(lead.recommendedServices.length > 0){
+      <div class="services">
+        <strong>🤖 Servicios IA recomendados:</strong>
+        <ul>
+          @for (service of lead.recommendedServices; track $index) {
+          <li>{{ service }}</li>
+          }
+        </ul>
+      </div>
+      }
+
+      <div class="message-box">
+        <label><strong>💬 Mensaje personalizado:</strong></label>
+        <textarea
+          [value]="lead.personalizedMessage"
+          readonly
+          rows="8"
+        ></textarea>
+      </div>
+
+      <div class="actions">
+        <button (click)="copyMessage(lead)" class="btn-copy">📋 Copiar</button>
+        <button
+          (click)="openWhatsApp(lead)"
+          [disabled]="!lead.Phone || lead.Phone === 'N/A'"
+          class="btn-whatsapp"
+        >
+          <img src="whatsapp-icon.png" alt="WhatsApp" width="20" />
+          Enviar
+        </button>
+        <button
+          (click)="copyAndOpen(lead)"
+          [disabled]="!lead.Phone || lead.Phone === 'N/A'"
+          class="btn-primary"
+        >
+          🚀 Copiar y Enviar
+        </button>
+      </div>
+
+      @if(lead.sent){
+      <div class="sent-badge">✅ Enviado</div>
+      }
+    </div>
+    }
+  </div>
+  } @if(!loading && leads.length === 0){
+  <div class="empty-state">
+    <p>📊 No hay leads cargados. Sube un archivo CSV para comenzar.</p>
+  </div>
+  } @if(loading){
+  <div class="loading-spinner">
+    <div class="spinner"></div>
+    <p>Procesando leads con IA...</p>
+  </div>
+  }
+</div>
