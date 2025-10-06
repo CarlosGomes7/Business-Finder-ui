@@ -46,6 +46,7 @@ title = 'Business Finder';
 
   ngOnInit() {
     this.loadBusinessTypes();
+    this.getCurrentLocation();
   }
 
   loadBusinessTypes() {
@@ -71,18 +72,55 @@ title = 'Business Finder';
   }
 
   getCurrentLocation() {
+    if (!navigator.geolocation) {
+      this.errorMessage = 'Tu navegador no soporta geolocalización';
+      return;
+    }
+
     this.isLoading = true;
-    this.geolocationService.getCurrentPosition().subscribe({
-      next: (position) => {
-        this.searchParams.lat = position.coords.latitude;
-        this.searchParams.lng = position.coords.longitude;
+    this.errorMessage = '';
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+
+        // Actualizar centro del mapa
+        this.center = { lat, lng };
+        this.markerPosition = { lat, lng };
+        
+        // Actualizar parámetros de búsqueda
+        this.searchParams.lat = lat;
+        this.searchParams.lng = lng;
+
         this.isLoading = false;
+        console.log('Ubicación obtenida:', { lat, lng });
       },
-      error: (error) => {
-        this.errorMessage = 'No se pudo obtener la ubicación actual. Verifica los permisos de ubicación.';
+      (error) => {
         this.isLoading = false;
+        
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            this.errorMessage = 'Permiso de ubicación denegado. Por favor, habilita el acceso a tu ubicación en la configuración del navegador.';
+            break;
+          case error.POSITION_UNAVAILABLE:
+            this.errorMessage = 'Información de ubicación no disponible.';
+            break;
+          case error.TIMEOUT:
+            this.errorMessage = 'Tiempo de espera agotado al obtener la ubicación.';
+            break;
+          default:
+            this.errorMessage = 'Error desconocido al obtener la ubicación.';
+        }
+        
+        console.error('Error obteniendo ubicación:', error);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0
       }
-    });
+    );
   }
 
   isValidLocation(): boolean {
